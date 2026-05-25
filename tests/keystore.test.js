@@ -71,7 +71,7 @@ test("generates a .keystore file as JKS", async () => {
   assert.equal(inspected.entries[0].signatureSha256, generated.signatureSha256);
 });
 
-test("defaults certificate validity to 100 days", async () => {
+test("defaults certificate validity to 36500 days", async () => {
   const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "keystore-maker-"));
   const outputPath = path.join(tempDir, "default-validity.jks");
   const generated = await generateAndroidKeystore({
@@ -84,7 +84,7 @@ test("defaults certificate validity to 100 days", async () => {
   const validFrom = Date.parse(generated.validFrom);
   const validTo = Date.parse(generated.validTo);
   const days = Math.round((validTo - validFrom) / (24 * 60 * 60 * 1000));
-  assert.equal(days, 100);
+  assert.equal(days, 36500);
 });
 
 test("caps certificate validity to 36500 days", async () => {
