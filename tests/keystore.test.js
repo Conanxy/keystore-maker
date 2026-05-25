@@ -40,6 +40,8 @@ test("generates and inspects a JKS keystore", async () => {
   assert.equal(inspected.storeType, "JKS");
   assert.equal(inspected.entries.length, 1);
   assert.equal(inspected.entries[0].signatureSha1, generated.signatureSha1);
+  assert.equal(inspected.entries[0].publicKeySha256, generated.publicKeySha256);
+  assert.match(inspected.entries[0].publicKeyPem, /^-----BEGIN PUBLIC KEY-----/);
   assert.match(inspected.entries[0].signature, /^[0-9A-F]+$/);
 });
 
@@ -77,4 +79,6 @@ test("generates and inspects a PKCS12 keystore", async () => {
   assert.equal(generated.storeType, "PKCS12");
   assert.equal(inspected.storeType, "PKCS12");
   assert.equal(inspected.entries[0].signatureSha1, generated.signatureSha1);
+  assert.equal(inspected.entries[0].publicKeySha1, generated.publicKeySha1);
+  assert.match(inspected.entries[0].publicKey, /^[0-9A-F]+$/);
 });

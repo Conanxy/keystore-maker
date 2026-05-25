@@ -288,7 +288,10 @@ function buildPkcs12({ alias, storePassword, keyPassword, cert, privateKey }) {
 
 function certificateInfo(certDer, alias = "") {
   const x509 = new crypto.X509Certificate(certDer);
+  const publicKey = x509.publicKey.export({ type: "spki", format: "der" });
+  const publicKeyPem = x509.publicKey.export({ type: "spki", format: "pem" });
   const hash = (algorithm) => crypto.createHash(algorithm).update(certDer).digest("hex").toUpperCase();
+  const publicKeyHash = (algorithm) => crypto.createHash(algorithm).update(publicKey).digest("hex").toUpperCase();
   const colon = (value) => value.match(/.{1,2}/g).join(":");
   const signature = certDer.toString("hex").toUpperCase();
   return {
@@ -302,10 +305,19 @@ function certificateInfo(certDer, alias = "") {
     signatureMd5: colon(hash("md5")),
     signatureSha1: colon(hash("sha1")),
     signatureSha256: colon(hash("sha256")),
+    publicKeyAlgorithm: x509.publicKey.asymmetricKeyType?.toUpperCase() || "UNKNOWN",
+    publicKey: publicKey.toString("hex").toUpperCase(),
+    publicKeyPem,
+    publicKeyMd5: colon(publicKeyHash("md5")),
+    publicKeySha1: colon(publicKeyHash("sha1")),
+    publicKeySha256: colon(publicKeyHash("sha256")),
     compact: {
       md5: hash("md5"),
       sha1: hash("sha1"),
-      sha256: hash("sha256")
+      sha256: hash("sha256"),
+      publicKeyMd5: publicKeyHash("md5"),
+      publicKeySha1: publicKeyHash("sha1"),
+      publicKeySha256: publicKeyHash("sha256")
     },
     pem: x509.toString()
   };
