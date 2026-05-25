@@ -162,7 +162,8 @@ h2 {
   min-width: 0;
   min-height: 0;
   max-height: 100vh;
-  overflow: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .panel,
@@ -284,8 +285,8 @@ textarea:focus {
 .result-panel {
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
-  min-height: 0;
-  max-height: 100%;
+  min-height: min(540px, calc(100vh - 56px));
+  max-height: calc(100vh - 56px);
   overflow: hidden;
   padding: 24px;
 }
@@ -303,6 +304,7 @@ textarea:focus {
 
 .results {
   display: grid;
+  align-content: start;
   gap: 12px;
   min-height: 0;
   overflow: auto;
@@ -391,6 +393,7 @@ textarea:focus {
   }
 
   .result-panel {
+    min-height: 420px;
     max-height: 70vh;
   }
 }
