@@ -1,5 +1,7 @@
 # Keystore Maker
 
+[中文说明](README.zh-CN.md)
+
 Keystore Maker is a standalone desktop tool for Android signing keystores. It can generate keystore files, inspect existing keystores, and display certificate fingerprints and public key formats commonly needed for app stores and备案/registration systems.
 
 中文：Keystore Maker 是一个用于 Android 签名证书的桌面工具，可生成 keystore，读取证书签名信息，并展示备案或应用市场常用的证书指纹与公钥格式。
