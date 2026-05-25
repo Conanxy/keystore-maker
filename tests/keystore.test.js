@@ -10,6 +10,12 @@ const {
   modifiedUtf8Encode
 } = require("../src/keystore");
 
+function modulusDecimalFromSpkiHex(publicKeyHex) {
+  const match = publicKeyHex.match(/0282010100([0-9A-F]{512})0203010001/);
+  assert.ok(match, "RSA modulus should be present in SPKI public key");
+  return BigInt(`0x${match[1]}`).toString();
+}
+
 test("modified UTF-8 round trips common aliases", () => {
   const aliases = ["release", "安卓发布", "alias-01"];
   for (const alias of aliases) {
@@ -41,6 +47,8 @@ test("generates and inspects a JKS keystore", async () => {
   assert.equal(inspected.entries.length, 1);
   assert.equal(inspected.entries[0].signatureSha1, generated.signatureSha1);
   assert.equal(inspected.entries[0].publicKeySha256, generated.publicKeySha256);
+  assert.equal(inspected.entries[0].publicKeyModulus, modulusDecimalFromSpkiHex(inspected.entries[0].publicKey));
+  assert.equal(inspected.entries[0].publicKeyExponent, "AQAB");
   assert.match(inspected.entries[0].publicKeyPem, /^-----BEGIN PUBLIC KEY-----/);
   assert.match(inspected.entries[0].signature, /^[0-9A-F]+$/);
 });

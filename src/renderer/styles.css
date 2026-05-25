@@ -356,6 +356,22 @@ textarea:focus {
   line-height: 1.45;
 }
 
+.public-key-body {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.public-key-select {
+  min-height: 34px;
+  padding: 0 10px;
+}
+
+.public-key-value {
+  max-height: 180px;
+  overflow: auto;
+}
+
 .copy-button {
   min-height: 28px;
   border-radius: 6px;

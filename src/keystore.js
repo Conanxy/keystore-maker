@@ -290,6 +290,10 @@ function certificateInfo(certDer, alias = "") {
   const x509 = new crypto.X509Certificate(certDer);
   const publicKey = x509.publicKey.export({ type: "spki", format: "der" });
   const publicKeyPem = x509.publicKey.export({ type: "spki", format: "pem" });
+  const publicKeyJwk = x509.publicKey.export({ format: "jwk" });
+  const publicKeyModulus = Buffer.from(publicKeyJwk.n, "base64url");
+  const publicKeyModulusHex = publicKeyModulus.toString("hex").toUpperCase();
+  const publicKeyModulusDecimal = BigInt(`0x${publicKeyModulusHex}`).toString();
   const hash = (algorithm) => crypto.createHash(algorithm).update(certDer).digest("hex").toUpperCase();
   const publicKeyHash = (algorithm) => crypto.createHash(algorithm).update(publicKey).digest("hex").toUpperCase();
   const colon = (value) => value.match(/.{1,2}/g).join(":");
@@ -308,6 +312,9 @@ function certificateInfo(certDer, alias = "") {
     publicKeyAlgorithm: x509.publicKey.asymmetricKeyType?.toUpperCase() || "UNKNOWN",
     publicKey: publicKey.toString("hex").toUpperCase(),
     publicKeyPem,
+    publicKeyModulus: publicKeyModulusDecimal,
+    publicKeyModulusHex,
+    publicKeyExponent: publicKeyJwk.e,
     publicKeyMd5: colon(publicKeyHash("md5")),
     publicKeySha1: colon(publicKeyHash("sha1")),
     publicKeySha256: colon(publicKeyHash("sha256")),

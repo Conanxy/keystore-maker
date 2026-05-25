@@ -32,8 +32,12 @@ const translations = {
     orgUnitLabel: "部门 OU",
     organizationLabel: "组织 O",
     publicKeyAlgorithmLabel: "公钥算法",
+    publicKeyDerHexLabel: "完整公钥 DER Hex",
+    publicKeyFormatLabel: "公钥格式",
     publicKeyLabel: "公钥",
     publicKeyMd5Label: "公钥MD5",
+    publicKeyModulusDecimalLabel: "RSA modulus 十进制",
+    publicKeyModulusHexLabel: "RSA modulus Hex",
     publicKeyPemLabel: "公钥PEM",
     publicKeySha1Label: "公钥SHA1",
     publicKeySha256Label: "公钥SHA256",
@@ -86,8 +90,12 @@ const translations = {
     orgUnitLabel: "Organization unit OU",
     organizationLabel: "Organization O",
     publicKeyAlgorithmLabel: "Public key algorithm",
+    publicKeyDerHexLabel: "Full public key DER hex",
+    publicKeyFormatLabel: "Public key format",
     publicKeyLabel: "Public key",
     publicKeyMd5Label: "Public key MD5",
+    publicKeyModulusDecimalLabel: "RSA modulus decimal",
+    publicKeyModulusHexLabel: "RSA modulus hex",
     publicKeyPemLabel: "Public key PEM",
     publicKeySha1Label: "Public key SHA1",
     publicKeySha256Label: "Public key SHA256",
@@ -219,6 +227,58 @@ function field(label, value) {
   return row;
 }
 
+function publicKeyField(entry) {
+  const formats = [
+    { label: t("publicKeyModulusDecimalLabel"), value: entry.publicKeyModulus || "" },
+    { label: t("publicKeyModulusHexLabel"), value: entry.publicKeyModulusHex || "" },
+    { label: t("publicKeyDerHexLabel"), value: entry.publicKey || "" },
+    { label: t("publicKeyPemLabel"), value: entry.publicKeyPem || "" }
+  ];
+  const row = document.createElement("div");
+  row.className = "field public-key-field";
+
+  const name = document.createElement("div");
+  name.className = "field-name";
+  name.textContent = t("publicKeyFormatLabel");
+
+  const body = document.createElement("div");
+  body.className = "public-key-body";
+
+  const select = document.createElement("select");
+  select.className = "public-key-select";
+  formats.forEach((format, index) => {
+    const option = document.createElement("option");
+    option.value = String(index);
+    option.textContent = format.label;
+    select.append(option);
+  });
+
+  const value = document.createElement("div");
+  value.className = "field-value public-key-value";
+
+  const copy = document.createElement("button");
+  copy.className = "copy-button";
+  copy.type = "button";
+  copy.textContent = t("copy");
+
+  const sync = () => {
+    value.textContent = formats[Number(select.value)]?.value || "";
+  };
+  select.addEventListener("change", sync);
+  copy.addEventListener("click", async () => {
+    await navigator.clipboard.writeText(value.textContent || "");
+    copy.textContent = t("copied");
+    window.setTimeout(() => {
+      copy.textContent = t("copy");
+    }, 900);
+  });
+  sync();
+
+  body.append(select, value);
+  row.append(name, body, copy);
+  return row;
+}
+
 function renderEntries(entries, metadata = {}) {
   resultsNode.replaceChildren();
   const lines = [];
@@ -247,8 +307,6 @@ function renderEntries(entries, metadata = {}) {
       ["Public Key MD5", entry.compact?.publicKeyMd5],
       ["Public Key SHA1", entry.compact?.publicKeySha1],
       ["Public Key SHA256", entry.compact?.publicKeySha256],
-      [t("publicKeyPemLabel"), entry.publicKeyPem],
-      [t("publicKeyLabel"), entry.publicKey],
       [t("subjectLabel"), entry.subject],
       [t("issuerLabel"), entry.issuer],
       [t("serialLabel"), entry.serialNumber],
@@ -260,6 +318,11 @@ function renderEntries(entries, metadata = {}) {
       wrapper.append(field(label, value));
       lines.push(`${label}: ${value || ""}`);
     });
+    wrapper.append(publicKeyField(entry));
+    lines.push(`${t("publicKeyModulusDecimalLabel")}: ${entry.publicKeyModulus || ""}`);
+    lines.push(`${t("publicKeyModulusHexLabel")}: ${entry.publicKeyModulusHex || ""}`);
+    lines.push(`${t("publicKeyDerHexLabel")}: ${entry.publicKey || ""}`);
+    lines.push(`${t("publicKeyPemLabel")}: ${entry.publicKeyPem || ""}`);
 
     resultsNode.append(wrapper);
   });
