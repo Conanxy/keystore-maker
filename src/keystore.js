@@ -187,7 +187,7 @@ function createCertificate(options) {
   const publicKey = forge.pki.publicKeyFromPem(publicKeyPem);
   const cert = forge.pki.createCertificate();
   const now = new Date();
-  const validityDays = clampInt(options.validityDays, 3650, 1, 36500);
+  const validityDays = clampInt(options.validityDays, 100, 1, 36500);
   const notAfter = new Date(now.getTime() + validityDays * 24 * 60 * 60 * 1000);
 
   cert.publicKey = publicKey;
@@ -217,7 +217,7 @@ function createCertificate(options) {
   const pkcs8Der = fromBinaryString(forge.asn1.toDer(pkcs8Asn1).getBytes());
   const certDer = fromBinaryString(forge.asn1.toDer(forge.pki.certificateToAsn1(cert)).getBytes());
 
-  return { privateKey, cert, pkcs8Der, certDer };
+  return { privateKey, cert, pkcs8Der, certDer, validityDays };
 }
 
 function protectPrivateKey(pkcs8Der, password) {
@@ -342,7 +342,7 @@ async function generateAndroidKeystore(options) {
     throw new Error(`当前类型请使用${selectedType.extensions.join("或")}后缀`);
   }
 
-  const { privateKey, cert, certDer, pkcs8Der } = createCertificate({ ...options, alias });
+  const { privateKey, cert, certDer, pkcs8Der, validityDays } = createCertificate({ ...options, alias });
   const keystore =
     keystoreType === "pkcs12"
       ? buildPkcs12({ alias, storePassword, keyPassword, cert, privateKey })
@@ -353,6 +353,7 @@ async function generateAndroidKeystore(options) {
   return {
     outputPath,
     storeType: selectedType.storeType,
+    validityDays,
     keyAlgorithm: "RSA",
     signatureAlgorithm: "SHA256withRSA",
     ...certificateInfo(certDer, alias)

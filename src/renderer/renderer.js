@@ -55,6 +55,7 @@ const translations = {
     subjectLabel: "Subject",
     validFromLabel: "Valid From",
     validToLabel: "Valid To",
+    validityClamped: "有效期已按最大值 {max} 天处理",
     validityLabel: "有效期(天)"
   },
   en: {
@@ -113,6 +114,7 @@ const translations = {
     subjectLabel: "Subject",
     validFromLabel: "Valid from",
     validToLabel: "Valid to",
+    validityClamped: "Validity was capped at {max} days",
     validityLabel: "Validity (days)"
   }
 };
@@ -133,6 +135,8 @@ const generateButton = document.querySelector("#generate-button");
 const inspectButton = document.querySelector("#inspect-button");
 const keystoreTypeSelect = document.querySelector("#keystoreType");
 const outputPathInput = document.querySelector("#outputPath");
+const validityInput = document.querySelector("#validityDays");
+const maxValidityDays = 36500;
 
 const typeConfig = {
   jks: { apiType: "jks", extension: ".jks", label: "JKS" },
@@ -177,6 +181,14 @@ function syncOutputPathExtension() {
   outputPathInput.placeholder = t("savePathTypePlaceholder", { extension: config.extension });
   outputPathInput.value = replaceExtension(outputPathInput.value, config.extension);
   generateButton.textContent = t("generateButton", { type: config.label });
+}
+
+function normalizeValidityInput(showStatus = false) {
+  const parsed = Number.parseInt(validityInput.value, 10);
+  if (Number.isFinite(parsed) && parsed > maxValidityDays) {
+    validityInput.value = String(maxValidityDays);
+    if (showStatus) setStatus(t("validityClamped", { max: maxValidityDays }));
+  }
 }
 
 function applyLanguage(lang) {
@@ -359,6 +371,7 @@ document.querySelector("#pick-open").addEventListener("click", async () => {
 
 generateButton.addEventListener("click", async () => {
   const form = document.querySelector("#generate-form");
+  normalizeValidityInput(true);
   if (!form.reportValidity()) return;
   const config = typeConfig[keystoreTypeSelect.value] || typeConfig.jks;
 
@@ -366,6 +379,7 @@ generateButton.addEventListener("click", async () => {
   setStatus(t("generateBusy", { type: config.label }));
   try {
     const result = await window.keystoreApi.generate(formValues(form));
+    validityInput.value = String(result.validityDays || validityInput.value);
     state.lastEntries = { entries: [result], metadata: result };
     renderEntries([result], result);
     setStatus(t("generateDone", { path: result.outputPath }));
@@ -401,4 +415,5 @@ document.querySelector("#copy-all").addEventListener("click", async () => {
 });
 
 keystoreTypeSelect.addEventListener("change", syncOutputPathExtension);
+validityInput.addEventListener("blur", () => normalizeValidityInput(true));
 applyLanguage(state.lang);
