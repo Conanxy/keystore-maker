@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Keystore Maker</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">K</div>
+          <div>
+            <h1>Keystore Maker</h1>
+            <p data-i18n="brandSubtitle">Android JKS 签名工具</p>
+          </div>
+        </div>
+        <div class="language-switch" role="group" aria-label="Language">
+          <button class="language-button active" data-lang="zh" type="button">中文</button>
+          <button class="language-button" data-lang="en" type="button">EN</button>
+        </div>
+        <div class="mode-switch" role="tablist" aria-label="功能切换" data-i18n-attr="aria-label:modeSwitchLabel">
+          <button class="mode-button active" data-panel="generate" data-i18n="generateTab" type="button">生成</button>
+          <button class="mode-button" data-panel="inspect" data-i18n="inspectTab" type="button">读取</button>
+        </div>
+        <div class="runtime-note">
+          <span>Standalone</span>
+          <p data-i18n="runtimeNote">打包后不依赖 Java、JDK、Android Studio 或 keytool。</p>
+        </div>
+      </aside>
+
+      <section class="workspace">
+        <section class="panel active" id="generate-panel" aria-labelledby="generate-title">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Create</p>
+              <h2 id="generate-title" data-i18n="generateTitle">生成 Android Keystore</h2>
+            </div>
+            <button class="primary-action" id="generate-button" type="button">生成</button>
+          </div>
+
+          <form class="form-grid" id="generate-form">
+            <label>
+              <span data-i18n="fileTypeLabel">文件类型</span>
+              <select id="keystoreType" name="keystoreType">
+                <option value="jks" selected>JKS (.jks)</option>
+                <option value="jks-keystore">JKS (.keystore)</option>
+                <option value="pkcs12">PKCS12 (.p12)</option>
+                <option value="pkcs12-pfx">PKCS12 (.pfx)</option>
+              </select>
+            </label>
+            <label>
+              <span data-i18n="savePathLabel">保存路径</span>
+              <div class="path-input">
+                <input id="outputPath" name="outputPath" data-i18n-attr="placeholder:savePathPlaceholder" placeholder="选择保存位置" required />
+                <button id="pick-save" data-i18n="chooseButton" type="button">选择</button>
+              </div>
+            </label>
+            <label>
+              <span data-i18n="aliasLabel">别名</span>
+              <input id="alias" name="alias" value="release" required />
+            </label>
+            <label>
+              <span data-i18n="keystorePasswordLabel">Keystore 密码</span>
+              <input id="storePassword" name="storePassword" type="password" minlength="6" required />
+            </label>
+            <label>
+              <span data-i18n="keyPasswordLabel">Key 密码</span>
+              <input id="keyPassword" name="keyPassword" type="password" minlength="6" required />
+            </label>
+            <label>
+              <span data-i18n="commonNameLabel">证书名称 CN</span>
+              <input id="commonName" name="commonName" value="Android Release" required />
+            </label>
+            <label>
+              <span data-i18n="organizationLabel">组织 O</span>
+              <input id="organization" name="organization" value="Unknown" />
+            </label>
+            <label>
+              <span data-i18n="orgUnitLabel">部门 OU</span>
+              <input id="orgUnit" name="orgUnit" value="Android" />
+            </label>
+            <label>
+              <span data-i18n="localityLabel">城市 L</span>
+              <input id="locality" name="locality" value="Unknown" />
+            </label>
+            <label>
+              <span data-i18n="stateLabel">省份 ST</span>
+              <input id="state" name="state" value="Unknown" />
+            </label>
+            <label>
+              <span data-i18n="countryLabel">国家 C</span>
+              <input id="country" name="country" value="CN" maxlength="2" />
+            </label>
+            <label>
+              <span data-i18n="validityLabel">有效期(天)</span>
+              <input id="validityDays" name="validityDays" type="number" min="1" max="36500" value="10000" />
+            </label>
+            <label>
+              <span data-i18n="keySizeLabel">RSA 位数</span>
+              <select id="keySize" name="keySize">
+                <option value="2048" selected>2048</option>
+                <option value="3072">3072</option>
+                <option value="4096">4096</option>
+              </select>
+            </label>
+          </form>
+        </section>
+
+        <section class="panel" id="inspect-panel" aria-labelledby="inspect-title">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Inspect</p>
+              <h2 id="inspect-title" data-i18n="inspectTitle">读取签名信息</h2>
+            </div>
+            <button class="primary-action" id="inspect-button" data-i18n="inspectButton" type="button">读取签名</button>
+          </div>
+
+          <form class="form-grid compact" id="inspect-form">
+            <label>
+              <span data-i18n="keystoreFileLabel">Keystore 文件</span>
+              <div class="path-input">
+                <input id="filePath" name="filePath" data-i18n-attr="placeholder:openPathPlaceholder" placeholder="选择 .jks / .keystore / .p12 / .pfx" required />
+                <button id="pick-open" data-i18n="chooseButton" type="button">选择</button>
+              </div>
+            </label>
+            <label>
+              <span data-i18n="keystorePasswordLabel">Keystore 密码</span>
+              <input id="inspectPassword" name="password" type="password" minlength="6" required />
+            </label>
+            <label>
+              <span data-i18n="aliasLabel">别名</span>
+              <input id="inspectAlias" name="alias" data-i18n-attr="placeholder:aliasOptionalPlaceholder" placeholder="留空读取全部证书" />
+            </label>
+          </form>
+        </section>
+
+        <section class="result-panel" aria-live="polite">
+          <div class="result-head">
+            <div>
+              <p class="eyebrow">Result</p>
+              <h2 data-i18n="resultTitle">签名结果</h2>
+            </div>
+            <button class="ghost-action" id="copy-all" data-i18n="copyAll" type="button">复制全部</button>
+          </div>
+          <div class="status" id="status" data-i18n="idleStatus">等待操作</div>
+          <div class="results" id="results"></div>
+        </section>
+      </section>
+    </main>
+    <script src="./renderer.js"></script>
+  </body>
+</html>
