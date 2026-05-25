@@ -187,7 +187,7 @@ function createCertificate(options) {
   const publicKey = forge.pki.publicKeyFromPem(publicKeyPem);
   const cert = forge.pki.createCertificate();
   const now = new Date();
-  const validityDays = clampInt(options.validityDays, 10000, 1, 36500);
+  const validityDays = clampInt(options.validityDays, 3650, 1, 36500);
   const notAfter = new Date(now.getTime() + validityDays * 24 * 60 * 60 * 1000);
 
   cert.publicKey = publicKey;

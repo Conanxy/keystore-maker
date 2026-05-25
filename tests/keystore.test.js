@@ -71,6 +71,22 @@ test("generates a .keystore file as JKS", async () => {
   assert.equal(inspected.entries[0].signatureSha256, generated.signatureSha256);
 });
 
+test("defaults certificate validity to 3650 days", async () => {
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "keystore-maker-"));
+  const outputPath = path.join(tempDir, "default-validity.jks");
+  const generated = await generateAndroidKeystore({
+    outputPath,
+    alias: "release",
+    storePassword: "changeit",
+    keyPassword: "keypass1",
+    commonName: "Android Release"
+  });
+  const validFrom = Date.parse(generated.validFrom);
+  const validTo = Date.parse(generated.validTo);
+  const days = Math.round((validTo - validFrom) / (24 * 60 * 60 * 1000));
+  assert.equal(days, 3650);
+});
+
 test("generates and inspects a PKCS12 keystore", async () => {
   const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "keystore-maker-"));
   const outputPath = path.join(tempDir, "release.p12");
